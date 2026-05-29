@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Repairing Management System</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#0f172a,#1e3a8a);
+    min-height:100vh;
+    padding:30px;
+    color:#fff;
+}
+
+.container{
+    max-width:1300px;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+    margin-bottom:25px;
+    font-size:32px;
+}
+
+.form-box{
+    background:#fff;
+    border-radius:15px;
+    padding:20px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.form-box input,
+.form-box select{
+    flex:1;
+    min-width:200px;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:#f1f5f9;
+}
+
+.form-box button{
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    background:#2563eb;
+    color:white;
+    cursor:pointer;
+}
+
+.search-box input{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    margin-bottom:20px;
+}
+
+.records{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:20px;
+}
+
+.record{
+    background:white;
+    color:black;
+    border-radius:15px;
+    padding:20px;
+}
+
+.record h3{
+    margin-bottom:10px;
+}
+
+.record p{
+    margin-bottom:8px;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+}
+
+.edit-btn{
+    background:#10b981;
+}
+
+.delete-btn{
+    background:#ef4444;
+}
+
+.actions button{
+    flex:1;
+    padding:10px;
+    border:none;
+    border-radius:8px;
+    color:white;
+    cursor:pointer;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>Repairing Management System</h1>
+
+<div class="form-box">
+
+<input type="text" id="customer" placeholder="Customer Name">
+
+<input type="text" id="phone" placeholder="Phone Number">
+
+<select id="Electronic Atom">
+<option>A/C</option>
+<option>Fridge</option>
+<option>Washer Machine</option>
+<option>Mobile</option>
+<option>Laptop</option>
+<option>Tv</option>
+<option>D Frizer</option>
+<option>Computer</option>
+
+
+
+<input type="text" id="issue" placeholder="Problem / Issue">
+
+<input type="number" id="bill" placeholder="Bill Amount">
+
+<select id="status">
+<option>Pending</option>
+<option>Done</option>
+
+</select>
+
+<button onclick="addRecord()">Add Repair</button>
+
+</div>
+
+<div class="search-box">
+<input type="text" id="search" placeholder="Search..." onkeyup="searchRecords()">
+</div>
+
+<div class="records" id="records"></div>
+
+</div>
+
+<script>
+
+let records=[];
+let editId=null;
+
+function addRecord(){
+
+let customer=document.getElementById("customer").value;
+let phone=document.getElementById("phone").value;
+let item=document.getElementById("item").value;
+let issue=document.getElementById("issue").value;
+let bill=document.getElementById("bill").value;
+let status=document.getElementById("status").value;
+
+if(customer===""||phone===""){
+alert("Please fill required fields.");
+return;
+}
+
+if(editId){
+
+records=records.map(record=>{
+
+if(record.id===editId){
+return{
+id:editId,
+customer,
+phone,
+item,
+issue,
+bill,
+status
+};
+}
+
+return record;
+
+});
+
+editId=null;
+
+}else{
+
+records.push({
+id:Date.now(),
+customer,
+phone,
+item,
+issue,
+bill,
+status
+});
+
+}
+
+clearForm();
+displayRecords();
+}
+
+function displayRecords(){
+
+let html="";
+
+records.forEach(record=>{
+
+html+=`
+
+<div class="record">
+
+<h3>${record.customer}</h3>
+
+<p>Phone: ${record.phone}</p>
+
+<p>Item: ${record.item}</p>
+
+<p>Issue: ${record.issue}</p>
+
+<p>Bill Amount: Rs ${record.bill}</p>
+
+<p>Status: ${record.status}</p>
+
+<div class="actions">
+
+<button class="edit-btn"
+onclick="editRecord(${record.id})">
+Edit
+</button>
+
+<button class="delete-btn"
+onclick="deleteRecord(${record.id})">
+Delete
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("records").innerHTML=html;
+}
+
+function deleteRecord(id){
+
+records=records.filter(record=>record.id!==id);
+
+displayRecords();
+}
+
+function editRecord(id){
+
+let record=records.find(r=>r.id===id);
+
+document.getElementById("customer").value=record.customer;
+document.getElementById("phone").value=record.phone;
+document.getElementById("item").value=record.item;
+document.getElementById("issue").value=record.issue;
+document.getElementById("bill").value=record.bill;
+document.getElementById("status").value=record.status;
+
+editId=id;
+}
+
+function searchRecords(){
+
+let value=document.getElementById("search").value.toLowerCase();
+
+let filtered=records.filter(record=>
+
+record.customer.toLowerCase().includes(value)||
+record.phone.toLowerCase().includes(value)||
+record.item.toLowerCase().includes(value)||
+record.issue.toLowerCase().includes(value)
+
+);
+
+let html="";
+
+filtered.forEach(record=>{
+
+html+=`
+
+<div class="record">
+
+<h3>${record.customer}</h3>
+
+<p>Phone: ${record.phone}</p>
+
+<p>Item: ${record.item}</p>
+
+<p>Issue: ${record.issue}</p>
+
+<p>Bill Amount: Rs ${record.bill}</p>
+
+<p>Status: ${record.status}</p>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("records").innerHTML=html;
+}
+
+function clearForm(){
+
+document.getElementById("customer").value="";
+document.getElementById("phone").value="";
+document.getElementById("item").value="";
+document.getElementById("issue").value="";
+document.getElementById("bill").value="";
+document.getElementById("status").value="Pending";
+
+}
+
+</script>
+
+</body>
+</html>
